@@ -5,7 +5,14 @@ def setup(bot):
     @bot.command(name="moveall", help="Move all members current connected to a voice channel into your specified channel")
     @commands.has_permissions(move_members=True)
     async def move_all(ctx, target_channel_name: str):
-        target_channel = discord.utils.get(ctx.guild.voice_channels, name=target_channel_name)
+        target_channel = None
+        target_name_lower = target_channel_name.lower()
+
+        #Find the target channel by partial name match. Case insensitive
+        for vc in ctx.guild.voice_channels:
+            if target_name_lower in vc.name.lower():
+                target_channel = vc
+                break
         
         #check to see if the target channel exists
         if target_channel:
@@ -21,9 +28,23 @@ def setup(bot):
 
     @bot.command(name="move", help="Move a member to a different voice channel")
     @commands.has_guild_permissions(move_members=True)
-    async def move(ctx, member: discord.Member, channel: discord.VoiceChannel):
-        await member.move_to(channel)
-        await ctx.send(f"Moved {member} to {channel.name}")
+    async def move(ctx, member: discord.Member, target_channel_name: str):
+        target_channel = None
+        target_name_lower = target_channel_name.lower()
+
+        #Find the target channel by partial name match. Case insensitive
+        for vc in ctx.guild.voice_channels:
+            if target_name_lower in vc.name.lower():
+                target_channel = vc
+                break
+        
+        #check to see if the target channel exists
+        if target_channel:
+            await member.move_to(target_channel)
+            await ctx.send(f"Moved {member} to {target_channel.name}")
+        #if the target channel is invalid
+        else:
+            await ctx.send("Invalid target channel name provided.")
     
     @bot.command(name="kick", help="Kick a member")
     @commands.has_permissions(kick_members=True)
