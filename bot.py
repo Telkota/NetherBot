@@ -29,4 +29,14 @@ from commands import welcome, moderation
 welcome.setup(bot)
 moderation.setup(bot)
 
+
+#Error Handling
+@bot.event
+async def on_command_error(ctx, error):
+    if isinstance(error, commands.CommandNotFound):
+        await ctx.send("Invalid command used. Please check the command and try again.")
+    else:
+        #handle other errors that may occur
+        await ctx.send("An error occurred while processing the command.")
+
 bot.run(TOKEN)
