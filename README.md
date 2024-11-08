@@ -8,7 +8,10 @@
 
  Report any bug to Telkota @ Discord or in the Nether Vortex discord server.
 
+Ver 0.2 - 08/nov/24 :
+- Added moderation capabilities (Kick, Ban, Mute/Deafen voice channel members, Move voice channel members)
+
  Ver 0.1 - 07/nov/24 :
  - Made sure the bot can connect to discord. 
  - Welcome message.
- - basic error handling.
+ - Basic error handling.
