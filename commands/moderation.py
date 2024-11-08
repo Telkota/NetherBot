@@ -153,14 +153,14 @@ def setup(bot):
         try:
             #check if the user is in a voice channel
             if member.voice is None:
-                await ctx.send(f"{member} is not in a voice channel. Muting is unnecessary.")
+                await ctx.send(f"{member} is not in a voice channel. deafening is unnecessary.")
                 return
             #check if the user is already deafened
             if member.voice.deaf:
                 await ctx.send(f"{member} is already deafened.")
                 return
             
-            await member.edit(deaf=True)
+            await member.edit(deafen=True)
             await ctx.send(f"Deafened {member}")
 
         except Exception as e:
@@ -202,7 +202,7 @@ def setup(bot):
                 await ctx.send(f"{member} is already undeafened.")
                 return
             
-            await member.edit(deaf=False)
+            await member.edit(deafen=False)
             await ctx.send(f"Undeafened {member}")
 
         except Exception as e:
@@ -219,6 +219,11 @@ def setup(bot):
             return
 
         try:
+            #if the user is not in voice chat, send error message and return
+            if member.voice is None:
+                await ctx.send(f"{member} is not in a voice chat, silencing them is unecessary.")
+                return
+            
             #check if the user is already silenced
             if member.voice.deaf and member.voice.mute:
                 await ctx.send(f"{member} is already silenced.")
@@ -226,7 +231,7 @@ def setup(bot):
             
             #check if the user is already muted but not deafened
             if member.voice.mute and not member.voice.deaf:
-                await member.edit(deaf=True)
+                await member.edit(deafen=True)
                 await ctx.send(f"{member} was already muted but not deafened - I've deafened them.")
                 return
             
@@ -266,11 +271,11 @@ def setup(bot):
 
             #Check if the user is deafened but not muted
             if member.voice.deaf and not member.voice.mute:
-                await member.edit(deaf=False)
+                await member.edit(deafen=False)
                 await ctx.send(f"{member} was undeafened. {member} wasn't muted to begin with.")
                 return
 
-            await member.edit(mute=False, deaf=False)
+            await member.edit(mute=False, deafen=False)
             await ctx.send(f"{member} was unsilenced. They can speak and hear again!")
 
         except Exception as e:
