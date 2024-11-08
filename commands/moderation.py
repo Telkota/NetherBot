@@ -67,3 +67,55 @@ def setup(bot):
         #Otherwise - Display just ban message
         else:
             await ctx.send(f"Banned {member}")
+
+    @bot.command(name="mute", help="Mute a member in voice")
+    @commands.has_permissions(mute_members=True)
+    async def mute(ctx, member: discord.Member):
+        #check if the user is in a voice channel
+        if member.voice is None:
+            await ctx.send(f"{member} is not in a voice channel. Muting is unnecessary.")
+            return
+        #check if the user is already muted
+        if member.voice.mute:
+            await ctx.send(f"{member} is already muted.")
+            return
+        
+        await member.edit(mute=True)
+        await ctx.send(f"Muted {member}")
+    
+    @bot.command(name="deafen", help="Deafen a member in voice")
+    @commands.has_permissions(deafen_members=True)
+    async def deafen(ctx, member: discord.Member):
+        #check if the user is in a voice channel
+        if member.voice is None:
+            await ctx.send(f"{member} is not in a voice channel. Muting is unnecessary.")
+            return
+        #check if the user is already deafened
+        if member.voice.deaf:
+            await ctx.send(f"{member} is already deafened.")
+            return
+        
+        await member.edit(deafen=True)
+        await ctx.send(f"Deafened {member}")
+    
+    @bot.command(name="unmute", help="Unmute a member in voice")
+    @commands.has_permissions(mute_members=True)
+    async def unmute(ctx, member: discord.Member):
+        #check if the user is already unmuted
+        if not member.voice.mute:
+            await ctx.send(f"{member} is already unmuted.")
+            return
+
+        await member.edit(mute=False)
+        await ctx.send(f"Unmuted {member}")
+    
+    @bot.command(name="undeafen", help="Undeafen a member in voice")
+    @commands.has_permissions(deafen_members=True)
+    async def undeafen(ctx, member: discord.Member):
+        #check if the user is already undeafened
+        if not member.voice.deaf:
+            await ctx.send(f"{member} is already undeafened.")
+            return
+        
+        await member.edit(deafen=False)
+        await ctx.send(f"Undeafened {member}")
