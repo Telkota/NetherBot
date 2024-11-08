@@ -23,10 +23,10 @@ async def on_ready():
         print(f"server name: {guild.name} (id: {guild.id})\n")
 
 #Import commands from other modules
-from commands import welcome
+from commands import welcome, moderation
 
 #Add commands to bot
 welcome.setup(bot)
-
+moderation.setup(bot)
 
 bot.run(TOKEN)
