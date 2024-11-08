@@ -160,7 +160,7 @@ def setup(bot):
                 await ctx.send(f"{member} is already deafened.")
                 return
             
-            await member.edit(deafen=True)
+            await member.edit(deaf=True)
             await ctx.send(f"Deafened {member}")
 
         except Exception as e:
@@ -202,9 +202,77 @@ def setup(bot):
                 await ctx.send(f"{member} is already undeafened.")
                 return
             
-            await member.edit(deafen=False)
+            await member.edit(deaf=False)
             await ctx.send(f"Undeafened {member}")
 
         except Exception as e:
             await ctx.send("An error occured while trying to undeafen the user.")
             print(f"Error in undeafen: {e}")
+    
+    @bot.command(name="silence", help="Mutes and Deafens a member in voice.")
+    @commands.has_guild_permissions(deafen_members=True)
+    @commands.has_guild_permissions(mute_members=True)
+    async def silence(ctx, member: discord.Member = None):
+        #if no member paramter is entered, return an error message and quit.
+        if member is None:
+            await ctx.send("Error: You didn't input a user to silence.")
+            return
+
+        try:
+            #check if the user is already silenced
+            if member.voice.deaf and member.voice.mute:
+                await ctx.send(f"{member} is already silenced.")
+                return
+            
+            #check if the user is already muted but not deafened
+            if member.voice.mute and not member.voice.deaf:
+                await member.edit(deaf=True)
+                await ctx.send(f"{member} was already muted but not deafened - I've deafened them.")
+                return
+            
+            #check if the user is already deafened but not muted
+            if member.voice.deaf and not member.voice.mute:
+                await member.edit(mute=True)
+                await ctx.send(f"{member} was already deafened but not muted - I've muted them.")
+                return
+            
+            await member.edit(mute=True, deaf=True)
+            await ctx.send(f"{member} has been silenced.")
+        
+        except Exception as e:
+            await ctx.send("An error occured while trying to silence the user.")
+            print(f"Error in silence: {e}")
+    
+    @bot.command(name="unsilence", help="Unmutes and Undeafens a member in voice")
+    @commands.has_guild_permissions(deafen_members=True)
+    @commands.has_guild_permissions(mute_members=True)
+    async def unsilence(ctx, member: discord.Member = None):
+        #if no member paramter is entered, return an error message and quit.
+        if member is None:
+            await ctx.send("Error: You didn't input a user to unsilence.")
+            return
+        
+        try:
+            #check if the user is already unsilenced
+            if not member.voice.deaf and not member.voice.mute:
+                await ctx.send(f"{member} isn't muted or deafened.")
+                return
+            
+            #Check if the user is muted but not deafened
+            if member.voice.mute and not member.voice.deaf:
+                await member.edit(mute=False)
+                await ctx.send(f"{member} was unmuted. {member} wasn't deafened to begin with.")
+                return
+
+            #Check if the user is deafened but not muted
+            if member.voice.deaf and not member.voice.mute:
+                await member.edit(deaf=False)
+                await ctx.send(f"{member} was undeafened. {member} wasn't muted to begin with.")
+                return
+
+            await member.edit(mute=False, deaf=False)
+            await ctx.send(f"{member} was unsilenced. They can speak and hear again!")
+
+        except Exception as e:
+            await ctx.send("An error occured while trying to unsilence the user.")
+            print(f"Error in unsilence: {e}")
