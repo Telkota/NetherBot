@@ -3,18 +3,30 @@ import random
 import string
 from datetime import datetime
 from discord.ext import commands
+from commands.utils import get_response_channel
 
 #generator for a short ID to attach to quotes
-def generate_id(lenght=8):
+def generate_id(length=8):
     characters = string.ascii_letters + string.digits
-    return "".join(random.choices(characters, k=lenght))
+    return "".join(random.choices(characters, k=length))
 
-def setup(bot):
-    @bot.command(name="addquote", help="Add a quote by replying to someone with !addquote. Alternatively add in ")
-    async def add_quote(ctx, *, quote: str = None):
+class Quotes(commands.Cog):
+    def __init__(self, bot):
+        self.bot = bot
+
+    #function for sending responses
+    async def send_response(self, ctx, message):
+        response_channel = get_response_channel(self.bot)
+        if response_channel is None:
+            response_channel = ctx.channel
+        await response_channel.send(message)
+
+    #function to add quotes - a user can reply to a message they want to add as a quote, or write out their own quote
+    @commands.command(name="addquote", help="Add a quote by replying to someone with !addquote. Alternatively add in your own quote")
+    async def add_quote(self, ctx, *, quote: str = None):
         #if nothing is provided and the message isn't replying to another message
         if ctx.message.reference is None and quote is None:
-            await ctx.send("Please provide a quote or reply to a message to add it to quotes")
+            await self.send_response(ctx, "Please provide a quote or reply to a message to add it to quotes")
             return
 
         #Capture the message being replied to
@@ -66,28 +78,30 @@ def setup(bot):
             with open("quotes.json", "w") as file:
                 json.dump([new_quote], file, indent=4)
 
-        await ctx.send(f"Quote added! ID: {new_quote['id']}")
+        await self.send_response(ctx, f"Quote added! ID: {new_quote['id']}")
 
-    @bot.command(name="rquote", help="Get a random quote")
-    async def get_quote(ctx):
+    #function to fetch a random quote from the json file
+    @commands.command(name="rquote", help="Get a random quote")
+    async def get_quote(self, ctx):
         try:
             with open("quotes.json", "r") as file:
                 quotes = json.load(file)
                 #if there is any quotes on file
                 if quotes:
                     quote = random.choice(quotes)
-                    await ctx.send(f"on {quote['date']}, {quote['user']} shared:\n"
+                    await self.send_response(ctx, f"on {quote['date']}, {quote['user']} shared:\n"
                                    f"{quote['quote']}\nID: {quote['id']}")
                 else:
-                    await ctx.send(f"No quotes available.\nBe on the look out for cool or funny things to quote!")
+                    await self.send_response(ctx, f"No quotes available.\nBe on the look out for cool or funny things to quote!")
         except FileNotFoundError:
-            await ctx.send("No quotes available.")
+            await self.send_response(ctx, "No quotes available.")
     
-    @bot.command(name="delquote", help="Delete a quote by its ID")
+    #function to delete a quote - Someone with the correct permissions can delete a quote.
+    @commands.command(name="delquote", help="Delete a quote by its ID")
     @commands.has_permissions(manage_messages=True)   #change this to the desired permission. administrator=True or manage_message=True
-    async def delete_quote(ctx, quote_id: str = None):
+    async def delete_quote(self, ctx, quote_id: str = None):
         if quote_id is None:
-            await ctx.send("you need to provide a quote ID.")
+            await self.send_response(ctx, "you need to provide a quote ID.")
             return
         try:
             with open("quotes.json", "r+") as file:
@@ -95,15 +109,15 @@ def setup(bot):
                 quotes = [quote for quote in quotes if quote["id"] != quote_id]
                 file.seek(0)
                 file.truncate()
-                json.dump(quotes.file, indent=4)
-            await ctx.send(f"Quote with ID {quote_id} has been deleted.")
+                json.dump(quotes, file, indent=4)
+            await self.send_response(ctx, f"Quote with ID {quote_id} has been deleted.")
         except FileNotFoundError:
-            await ctx.send("No quotes available to delete.")
+            await self.send_response(ctx, "No quotes available to delete.")
     
-    @bot.command(name="quote", help="Get a quote based on its ID")
-    async def get_quote_by_id(ctx, quote_id: str = None):
+    @commands.command(name="quote", help="Get a quote based on its ID")
+    async def get_quote_by_id(self, ctx, quote_id: str = None):
         if quote_id is None:
-            await ctx.send("Please provide a quote ID.")
+            await self.send_response(ctx, "Please provide a quote ID.")
             return
         
         #load up the file to find the quote
@@ -112,11 +126,14 @@ def setup(bot):
                 quotes = json.load(file)
                 for quote in quotes:
                     if quote["id"] == quote_id:
-                        await ctx.send(f"On {quote['date']}, {quote['user']} shared:\n"
+                        await self.send_response(ctx, f"On {quote['date']}, {quote['user']} shared:\n"
                                        f"{quote['quote']}\nID: {quote['id']}")
                         return
                 #if no quote by that ID is found, report back to the user
-                await ctx.send(f"No quote found with the ID {quote_id}.")
+                await self.send_response(ctx, f"No quote found with the ID {quote_id}.")
         except FileNotFoundError:
-            await ctx.send("No quotes available.")
+            await self.send_response(ctx, "No quotes available.")
                 
+async def setup(bot):
+    print("Quotes bot setup called")
+    await bot.add_cog(Quotes(bot))

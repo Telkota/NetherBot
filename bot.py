@@ -2,11 +2,13 @@ import os
 import discord
 import logging
 import traceback
+import asyncio
+from commands.utils import get_response_channel
 from discord.ext import commands
 from dotenv import load_dotenv
 
 #setup logging
-logging.basicConfig(level=logging.ERROR)
+logging.basicConfig(level=logging.INFO)
 
 #grab token from .env file
 load_dotenv()
@@ -18,46 +20,63 @@ intents.message_content = True
 intents.members = True
 intents.voice_states = True
 
-bot = commands.Bot(command_prefix="!", intents=intents)
+class NetherBot(commands.Bot):
+    def __init__(self):
+        super().__init__(command_prefix="!", intents=intents)
+    
+    async def load_cogs(self):
+        cogs = ["commands.moderation", "commands.quotes", "commands.welcome"]
+        try:
+            for cog in cogs:
+                await self.load_extension(cog)
+                logging.info(f"{cog} loaded succesfully")
+        except Exception as e:
+            logging.error(f"Error in loading cogs: {e}")
 
+    async def setup_hook(self):
+        await self.load_cogs()
+    
+    async def on_ready(self):
+        logging.info(f"Logged in as {self.user.name}")
+        print(f"{self.user} is connected to the following guilds:")
+        for guild in self.guilds:
+            print(f"server name: {guild.name} (id: {guild.id})")
 
-#on startup message in console
-@bot.event
-async def on_ready():
-    print(f"\n{bot.user} is connected to the following guild:")
-    for guild in bot.guilds:
-        print(f"server name: {guild.name} (id: {guild.id})\n")
+    #Error Responsing
+    async def send_error_response(self, ctx, message):
+        response_channel = get_response_channel(self)
+        if response_channel is None:
+            response_channel = ctx.channel
+        await response_channel.send(message)
 
-        #for testing purposes: Bot Permissions. Remove later
-        bot_member = guild.get_member(bot.user.id)
-        for channel in guild.channels:
-            permissions = channel.permissions_for(bot_member)
-            print(f"Channel: {channel.name}, Permissions: {permissions}")
+    #Error Handling
+    async def on_command_error(self, ctx, error):
+        if isinstance(error, commands.CommandNotFound):
+            await self.send_error_response(ctx, f"Invalid command. Please check the command and try again.\n"
+                                                 "If you don't know what commands I have you can check out `!help` to get a list of commands")
+        elif isinstance(error, commands.MissingPermissions):
+            await self.send_error_response(ctx, "You don't have the required permissions to run this command. ")
+        else:
+            #Log the error details in the console
+            logging.error(f"An error occured: {error}")
+            traceback.print_exception(type(error), error, error.__traceback__)
+            
+            #Send an error message in Discord
+            await self.send_error_response(ctx, f"An error occurred while processing the command:\n"
+                        f"{error}")
 
-#Import commands from other modules
-from commands import welcome, moderation, quotes
+async def main():
+    bot = NetherBot()
 
-#Add commands to bot
-welcome.setup(bot)
-moderation.setup(bot)
-quotes.setup(bot)
+    #try-except block for handling shutdowns through keyboard interruption
+    try:
+        async with bot:
+            await bot.start(TOKEN)
+    except (KeyboardInterrupt, asyncio.CancelledError):
+        logging.info("Bot is shutting down doe to keyboard interruption...")
+        await bot.close()
+    finally:
+        logging.info("Bot has been closed cleanly. Hopefully.")
 
-
-#Error Handling
-@bot.event
-async def on_command_error(ctx, error):
-    if isinstance(error, commands.CommandNotFound):
-        await ctx.send(f"Invalid command. Please check the command and try again.\n"
-                       "If you don't know what commands I have you can check out `!help` to get a list of commands")
-    elif isinstance(error, commands.MissingPermissions):
-        await ctx.send("You don't have the required permissions to run this command. ")
-    else:
-        #Log the error details in the console
-        logging.error(f"An error occured: {error}")
-        traceback.print_exception(type(error), error, error.__traceback__)
-        
-        #Send an error message in Discord
-        await ctx.send(f"An error occurred while processing the command:\n"
-                       f"{error}")
-
-bot.run(TOKEN)
+if __name__ == "__main__":
+    asyncio.run(main())
