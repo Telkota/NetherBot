@@ -24,7 +24,7 @@ def setup(bot):
             #Check if the reply is to an image
             if referenced_message.attachments:
                 image_url = referenced_message.attachments[0].url
-                quote = f"[Image: {image_url}]"
+                quote = f"Image: {image_url}"
             else:
                 quote = referenced_message.content
         #If it's not a reply and the user has provided some text
@@ -66,7 +66,7 @@ def setup(bot):
             with open("quotes.json", "w") as file:
                 json.dump([new_quote], file, indent=4)
 
-        await ctx.send("Quote added!")
+        await ctx.send(f"Quote added! ID: {new_quote['id']}")
 
     @bot.command(name="rquote", help="Get a random quote")
     async def get_quote(ctx):
@@ -77,7 +77,7 @@ def setup(bot):
                 if quotes:
                     quote = random.choice(quotes)
                     await ctx.send(f"on {quote['date']}, {quote['user']} shared:\n"
-                                   f"`{quote['quote']}`\nID: {quote['id']}")
+                                   f"{quote['quote']}\nID: {quote['id']}")
                 else:
                     await ctx.send(f"No quotes available.\nBe on the look out for cool or funny things to quote!")
         except FileNotFoundError:
@@ -113,7 +113,7 @@ def setup(bot):
                 for quote in quotes:
                     if quote["id"] == quote_id:
                         await ctx.send(f"On {quote['date']}, {quote['user']} shared:\n"
-                                       f"`{quote['quote']}\nID: {quote['id']}`")
+                                       f"{quote['quote']}\nID: {quote['id']}")
                         return
                 #if no quote by that ID is found, report back to the user
                 await ctx.send(f"No quote found with the ID {quote_id}.")

@@ -35,11 +35,12 @@ async def on_ready():
             print(f"Channel: {channel.name}, Permissions: {permissions}")
 
 #Import commands from other modules
-from commands import welcome, moderation
+from commands import welcome, moderation, quotes
 
 #Add commands to bot
 welcome.setup(bot)
 moderation.setup(bot)
+quotes.setup(bot)
 
 
 #Error Handling
