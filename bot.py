@@ -25,7 +25,7 @@ class NetherBot(commands.Bot):
         super().__init__(command_prefix="!", intents=intents)
     
     async def load_cogs(self):
-        cogs = ["commands.moderation", "commands.quotes", "commands.welcome"]
+        cogs = ["commands.moderation", "commands.quotes", "commands.welcome", "commands.channel_manager"]
         try:
             for cog in cogs:
                 await self.load_extension(cog)

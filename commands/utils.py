@@ -13,7 +13,7 @@ def get_response_channel(bot):
     return None
 
 #function for sending responses
-async def send_response(bot, ctx, message):
+async def send_response(bot, ctx, message, delete_after=None):
     response_channel = get_response_channel(bot)
     #try-except just in case something happens
     try:
@@ -23,9 +23,12 @@ async def send_response(bot, ctx, message):
 
         #Don't mention the user if the command is sent in the same channel as the response channel
         if response_channel.id == ctx.channel.id:
-            await response_channel.send(message)
+            sent_message = await response_channel.send(message, delete_after=delete_after)
         else:
             user_mention = ctx.author.mention
-            await response_channel.send(f"{user_mention} - {message}")
+            sent_message = await response_channel.send(f"{user_mention} - {message}", delete_after=delete_after)
+        #return sent_message statement to make delete_messages work (channel_manager.py)
+        return sent_message
     except Exception as e:
         await ctx.channel.send(f"An error occured while sending the response. {e}")
+        return None
