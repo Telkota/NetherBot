@@ -8,6 +8,10 @@
 
  Report any bug to Telkota @ Discord or in the Nether Vortex discord server.
 
+Var 0.3.5 - 10/11/24:
+- Reformatted how the quote is presented
+- Simplified the unique IDs for quotes
+
 Ver 0.3 - 08-09/nov/24:
 - Added quote capabilities.
     - users can add quotes either by replying to a message or writing something to quote
