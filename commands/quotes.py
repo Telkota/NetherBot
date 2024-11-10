@@ -1,5 +1,6 @@
 import json
 import random
+import re
 from datetime import datetime
 from discord.ext import commands
 from commands.utils import get_response_channel
@@ -11,10 +12,24 @@ def get_highest_id(quotes):
     return max(int(quote['id']) for quote in quotes)
 
 def format_quote(quote):
-    return (f"> **{quote['user']}**\n"
-            f"> *on {quote['date']}*\n"
-            f">{quote['quote']}\n"
-            f"> ID:  `{quote['id']}`")
+    #break up the quote into variables for readability and ease of use
+    nickname = quote['user']['nickname']
+    username = quote['user']['username']
+    date = quote['date']
+    quote_body = quote['quote']
+    quote_id = quote['id']
+
+    #to not break the formatting, add "> " after any new line in the quote
+    quote_body = quote_body.replace("\n", "\n> ")
+
+    formatted_quote = (f"> **{nickname}** ({username})\n"
+                       f"> *on {date}*\n"
+                       f"> \n"
+                       f"> {quote_body}\n"
+                       f"> \n"
+                       f"> ID:  `{quote_id}`")
+    
+    return formatted_quote
 
 class Quotes(commands.Cog):
     def __init__(self, bot):
@@ -39,6 +54,9 @@ class Quotes(commands.Cog):
         if ctx.message.reference is not None:
             referenced_message = await ctx.channel.fetch_message(ctx.message.reference.message_id)
             user = referenced_message.author
+            nickname = user.display_name or user.name       #use nickname if available, otherwise use the username
+            username = user.name
+
             #Check if the reply is to an image
             if referenced_message.attachments:
                 image_url = referenced_message.attachments[0].url
@@ -48,6 +66,11 @@ class Quotes(commands.Cog):
         #If it's not a reply and the user has provided some text
         else:
             user = ctx.message.author
+            nickname = user.display_name or user.name       #use nickname if available, otherwise use the username
+            username = user.name
+
+        # remote custom emojis as the bot can't use those
+        quote = re.sub(r'<:\w+:\d+>', '', quote)
 
         #reformat the date to DD/MM/YYYY
         formatted_date = ctx.message.created_at.strftime("%d/%m/%Y")
@@ -56,7 +79,8 @@ class Quotes(commands.Cog):
         try:
             with open("quotes.json", "r+") as file:
                 quotes = json.load(file)
-        except FileNotFoundError:
+        #in case there is no file or an empty file
+        except (FileNotFoundError, json.JSONDecodeError):
             quotes = []
         
         #find highest ID and increment it by 1
@@ -66,7 +90,7 @@ class Quotes(commands.Cog):
         #save the quote in a dictionary for inserting into quotes.json
         new_quote = {
             "id": str(new_id),
-            "user": str(user),
+            "user": {"nickname": nickname, "username": username},
             "quote": quote,
             "date": formatted_date
         }
@@ -76,7 +100,7 @@ class Quotes(commands.Cog):
         with open("quotes.json", "w") as file:
             json.dump(quotes, file, indent=4)
 
-        await self.send_response(ctx, f"Quote added! ID: {new_quote['id']}")
+        await self.send_response(ctx, f"Quote added!\nID: {new_quote['id']}")
 
     #function to fetch a random quote from the json file
     @commands.command(name="rquote", help="Get a random quote")

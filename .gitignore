@@ -1,3 +1,7 @@
+#Ignore config and quote file
+config.json
+quotes.json
+
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]
