@@ -1,10 +1,6 @@
 import discord
 from discord.ext import commands
 
-#List of channel names to check for welcome message - Switch out or add names as needed
-welcome_channel_names = ["social", "general"]
-
-
 class Welcome(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
@@ -15,7 +11,7 @@ class Welcome(commands.Cog):
         channel = member.guild.system_channel
         if channel is not None:
             await channel.send(f"Welcome to {member.guild.name}, {member.mention}!\n"
-                               "No specific rules to mention - Just act like a normal humanbeing.\n"
+                               "No specific rules to mention.\n"
                                "If you have any questions, feel free to DM any officer/admin!")
 
 async def setup(bot):

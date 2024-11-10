@@ -1,26 +1,23 @@
 from discord.ext import commands
-from commands.utils import get_response_channel
+import commands.utils as u
 import discord
 import json
+import logging
+
+#enable logging
+logging.basicConfig(level=logging.DEBUG)
 
 class Moderation(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
     
-    #function for sending responses
-    async def send_response(self, ctx, message):
-        response_channel = get_response_channel(self.bot)
-        if response_channel is None:
-            response_channel = ctx.channel
-        await response_channel.send(message)
-
     #Move all function - command to move all users to a specific voice channel
     @commands.command(name="moveall", help="Move all members current connected to a voice channel into your specified channel")
     @commands.has_guild_permissions(move_members=True)
     async def move_all(self, ctx, target_channel_name: str = None):
         #if no target parameter is entered, return an error message and quit.
         if target_channel_name is None:
-            await self.send_response(ctx, "Error: No target channel name provided. Please specify a target channel.")
+            await u.send_response(self.bot, ctx, "Error: No target channel name provided. Please specify a target channel.")
             return
         
         try:
@@ -41,14 +38,14 @@ class Moderation(commands.Cog):
                             await member.move_to(target_channel)
 
                 #confirmation message that it was successful
-                await self.send_response(ctx, f"All members moved to {target_channel.name} from other voice channels")
+                await u.send_response(self.bot, ctx, f"All members moved to {target_channel.name} from other voice channels")
 
             #if the target channel is invalid
             else:
-                await self.send_response(ctx, "Invalid target channel name provided.")
+                await u.send_response(self.bot, ctx, "Invalid target channel name provided.")
 
         except Exception as e:
-            await self.send_response(ctx, "An error occurred while trying to move users.")
+            await u.send_response(self.bot, ctx, "An error occurred while trying to move users.")
             print(f"Error in move_all: {e}")
 
     #Move function - Moves a user to a specific channel
@@ -57,12 +54,12 @@ class Moderation(commands.Cog):
     async def move(self, ctx, member: discord.Member = None, target_channel_name: str = None):
         #if no target or member parameter is entered, return an error message and quit.
         if member is None and target_channel_name is None:
-            await self.send_response(ctx, f"Error: You didn't specify a user nor target channel.\n"
+            await u.send_response(self.bot, ctx, f"Error: You didn't specify a user nor target channel.\n"
                            "To use this command, provide a user and target channel.\n"
                            "`!move <user> <target-channel>`")
             return
         elif target_channel_name is None:
-            await self.send_response(ctx, "Error: You didn't specify a target channel.")
+            await u.send_response(self.bot, ctx, "Error: You didn't specify a target channel.")
             return
         
         try:
@@ -78,14 +75,14 @@ class Moderation(commands.Cog):
             #check to see if the target channel exists
             if target_channel:
                 await member.move_to(target_channel)
-                await self.send_response(ctx, f"Moved {member} to {target_channel.name}")
+                await u.send_response(self.bot, ctx, f"Moved {member} to {target_channel.name}")
 
             #if the target channel is invalid
             else:
-                await self.send_response(ctx, "Invalid target channel name provided.")
+                await u.send_response(self.bot, ctx, "Invalid target channel name provided.")
 
         except Exception as e:
-            await self.send_response(ctx, "An error occured while trying to move the user")
+            await u.send_response(self.bot, ctx, "An error occured while trying to move the user")
             print(f"Error in move: {e}")
     
     #kick function - Kicks a user with or without a reason
@@ -94,20 +91,20 @@ class Moderation(commands.Cog):
     async def kick(self, ctx, member: discord.Member = None, *, reason=None):
         #if no member paramter is entered, return an error message and quit.
         if member is None:
-            await self.send_response(ctx, "Error: You didn't input a user to kick.")
+            await u.send_response(self.bot, ctx, "Error: You didn't input a user to kick.")
             return
         
         try:
             await member.kick(reason=reason)
             #if reason is given - Display reason
             if reason is not None:
-                await self.send_response(ctx, f"Kicked {member}. Reason: {reason}")
+                await u.send_response(self.bot, ctx, f"Kicked {member}. Reason: {reason}")
             #Otherwise - Display just kick message
             else:
-                await self.send_response(ctx, f"Kicked {member}")
+                await u.send_response(self.bot, ctx, f"Kicked {member}")
 
         except Exception as e:
-            await self.send_response(ctx, "An error occured while trying to kick the user.")
+            await u.send_response(self.bot, ctx, "An error occured while trying to kick the user.")
             print(f"Error in kick: {e}")
 
     #ban function - Bans a user with or without a reason
@@ -116,20 +113,20 @@ class Moderation(commands.Cog):
     async def ban(self, ctx, member: discord.Member = None, *, reason=None):
         #if no member paramter is entered, return an error message and quit.
         if member is None:
-            await self.send_response(ctx, "Error: You didn't input a user to ban.")
+            await u.send_response(self.bot, ctx, "Error: You didn't input a user to ban.")
             return
         
         try:
             await member.ban(reason=reason)
             #if reason is given - Display reason
             if reason is not None:
-                await self.send_response(ctx, f"Banned {member}. Reason: {reason}")
+                await u.send_response(self.bot, ctx, f"Banned {member}. Reason: {reason}")
             #Otherwise - Display just ban message
             else:
-                await self.send_response(ctx, f"Banned {member}")
+                await u.send_response(self.bot, ctx, f"Banned {member}")
 
         except Exception as e:
-            await self.send_response(ctx, "An error occured while trying to ban the user.")
+            await u.send_response(self.bot, ctx, "An error occured while trying to ban the user.")
             print(f"Error in ban: {e}")
 
     #Mute function - Mutes a user if they are in a voice channel
@@ -138,24 +135,24 @@ class Moderation(commands.Cog):
     async def mute(self, ctx, member: discord.Member = None):
         #if no member paramter is entered, return an error message and quit.
         if member is None:
-            await self.send_response(ctx, "Error: You didn't input a user to mute.")
+            await u.send_response(self.bot, ctx, "Error: You didn't input a user to mute.")
             return
         
         try:
             #check if the user is in a voice channel
             if member.voice is None:
-                await self.send_response(ctx, f"{member} is not in a voice channel. Muting is unnecessary.")
+                await u.send_response(self.bot, ctx, f"{member} is not in a voice channel. Muting is unnecessary.")
                 return
             #check if the user is already muted
             if member.voice.mute:
-                await self.send_response(ctx, f"{member} is already muted.")
+                await u.send_response(self.bot, ctx, f"{member} is already muted.")
                 return
             
             await member.edit(mute=True)
-            await self.send_response(ctx, f"Muted {member}")
+            await u.send_response(self.bot, ctx, f"Muted {member}")
 
         except Exception as e:
-            await self.send_response(ctx, "An error occured while trying to mute the user.")
+            await u.send_response(self.bot, ctx, "An error occured while trying to mute the user.")
             print(f"Error in mute: {e}")
     
     #Deafen function - Deafens a user if they are in a voice channel.
@@ -164,24 +161,24 @@ class Moderation(commands.Cog):
     async def deafen(self, ctx, member: discord.Member = None):
         #if no member paramter is entered, return an error message and quit.
         if member is None:
-            await self.send_response(ctx, "Error: You didn't input a user to deafen.")
+            await u.send_response(self.bot, ctx, "Error: You didn't input a user to deafen.")
             return
         
         try:
             #check if the user is in a voice channel
             if member.voice is None:
-                await self.send_response(ctx, f"{member} is not in a voice channel. deafening is unnecessary.")
+                await u.send_response(self.bot, ctx, f"{member} is not in a voice channel. deafening is unnecessary.")
                 return
             #check if the user is already deafened
             if member.voice.deaf:
-                await self.send_response(ctx, f"{member} is already deafened.")
+                await u.send_response(self.bot, ctx, f"{member} is already deafened.")
                 return
             
             await member.edit(deafen=True)
-            await self.send_response(ctx, f"Deafened {member}")
+            await u.send_response(self.bot, ctx, f"Deafened {member}")
 
         except Exception as e:
-            await self.send_response(ctx, "An error occured while trying to deafen the user.")
+            await u.send_response(self.bot, ctx, "An error occured while trying to deafen the user.")
             print(f"Error in deafen: {e}")
     
     #unmute function - Unmute a user
@@ -190,20 +187,20 @@ class Moderation(commands.Cog):
     async def unmute(self, ctx, member: discord.Member = None):
         #if no member paramter is entered, return an error message and quit.
         if member is None:
-            await self.send_response(ctx, "Error: You didn't input a user to unmute.")
+            await u.send_response(self.bot, ctx, "Error: You didn't input a user to unmute.")
             return
         
         try:
             #check if the user is already unmuted
             if not member.voice.mute:
-                await self.send_response(ctx, f"{member} is already unmuted.")
+                await u.send_response(self.bot, ctx, f"{member} is already unmuted.")
                 return
 
             await member.edit(mute=False)
-            await self.send_response(ctx, f"Unmuted {member}")
+            await u.send_response(self.bot, ctx, f"Unmuted {member}")
 
         except Exception as e:
-            await self.send_response(ctx, "An error occured while trying to unmute the user.")
+            await u.send_response(self.bot, ctx, "An error occured while trying to unmute the user.")
             print(f"Error in unmute: {e}")
     
     #Undeafen function - Undeafens a user
@@ -212,20 +209,20 @@ class Moderation(commands.Cog):
     async def undeafen(self, ctx, member: discord.Member = None):
         #if no member paramter is entered, return an error message and quit.
         if member is None:
-            await self.send_response(ctx, "Error: You didn't input a user to undeafen.")
+            await u.send_response(self.bot, ctx, "Error: You didn't input a user to undeafen.")
             return
         
         try:
             #check if the user is already undeafened
             if not member.voice.deaf:
-                await self.send_response(ctx, f"{member} is already undeafened.")
+                await u.send_response(self.bot, ctx, f"{member} is already undeafened.")
                 return
             
             await member.edit(deafen=False)
-            await self.send_response(ctx, f"Undeafened {member}")
+            await u.send_response(self.bot, ctx, f"Undeafened {member}")
 
         except Exception as e:
-            await self.send_response(ctx, "An error occured while trying to undeafen the user.")
+            await u.send_response(self.bot, ctx, "An error occured while trying to undeafen the user.")
             print(f"Error in undeafen: {e}")
     
     #silence function - Mutes and deafens a user if they are in voice
@@ -235,37 +232,37 @@ class Moderation(commands.Cog):
     async def silence(self, ctx, member: discord.Member = None):
         #if no member paramter is entered, return an error message and quit.
         if member is None:
-            await self.send_response(ctx, "Error: You didn't input a user to silence.")
+            await u.send_response(self.bot, ctx, "Error: You didn't input a user to silence.")
             return
 
         try:
             #if the user is not in voice chat, send error message and return
             if member.voice is None:
-                await self.send_response(ctx, f"{member} is not in a voice chat, silencing them is unecessary.")
+                await u.send_response(self.bot, ctx, f"{member} is not in a voice chat, silencing them is unecessary.")
                 return
             
             #check if the user is already silenced
             if member.voice.deaf and member.voice.mute:
-                await self.send_response(ctx, f"{member} is already silenced.")
+                await u.send_response(self.bot, ctx, f"{member} is already silenced.")
                 return
             
             #check if the user is already muted but not deafened
             if member.voice.mute and not member.voice.deaf:
                 await member.edit(deafen=True)
-                await self.send_response(ctx, f"{member} was already muted but not deafened - I've deafened them.")
+                await u.send_response(self.bot, ctx, f"{member} was already muted but not deafened - I've deafened them.")
                 return
             
             #check if the user is already deafened but not muted
             if member.voice.deaf and not member.voice.mute:
                 await member.edit(mute=True)
-                await self.send_response(ctx, f"{member} was already deafened but not muted - I've muted them.")
+                await u.send_response(self.bot, ctx, f"{member} was already deafened but not muted - I've muted them.")
                 return
             
             await member.edit(mute=True, deaf=True)
-            await self.send_response(ctx, f"{member} has been silenced.")
+            await u.send_response(self.bot, ctx, f"{member} has been silenced.")
         
         except Exception as e:
-            await self.send_response(ctx, "An error occured while trying to silence the user.")
+            await u.send_response(self.bot, ctx, "An error occured while trying to silence the user.")
             print(f"Error in silence: {e}")
     
     #unsilence function - Unmutes and undeafens a user
@@ -275,32 +272,32 @@ class Moderation(commands.Cog):
     async def unsilence(self, ctx, member: discord.Member = None):
         #if no member paramter is entered, return an error message and quit.
         if member is None:
-            await self.send_response(ctx, "Error: You didn't input a user to unsilence.")
+            await u.send_response(self.bot, ctx, "Error: You didn't input a user to unsilence.")
             return
         
         try:
             #check if the user is already unsilenced
             if not member.voice.deaf and not member.voice.mute:
-                await self.send_response(ctx, f"{member} isn't muted or deafened.")
+                await u.send_response(self.bot, ctx, f"{member} isn't muted or deafened.")
                 return
             
             #Check if the user is muted but not deafened
             if member.voice.mute and not member.voice.deaf:
                 await member.edit(mute=False)
-                await self.send_response(ctx, f"{member} was unmuted. {member} wasn't deafened to begin with.")
+                await u.send_response(self.bot, ctx, f"{member} was unmuted. {member} wasn't deafened to begin with.")
                 return
 
             #Check if the user is deafened but not muted
             if member.voice.deaf and not member.voice.mute:
                 await member.edit(deafen=False)
-                await self.send_response(ctx, f"{member} was undeafened. {member} wasn't muted to begin with.")
+                await u.send_response(self.bot, ctx, f"{member} was undeafened. {member} wasn't muted to begin with.")
                 return
 
             await member.edit(mute=False, deafen=False)
-            await self.send_response(ctx, f"{member} was unsilenced. They can speak and hear again!")
+            await u.send_response(self.bot, ctx, f"{member} was unsilenced. They can speak and hear again!")
 
         except Exception as e:
-            await self.send_response(ctx, "An error occured while trying to unsilence the user.")
+            await u.send_response(self.bot, ctx, "An error occured while trying to unsilence the user.")
             print(f"Error in unsilence: {e}")
     
     #Set response channel - Function to let admins/moderators set a channel for the bot to respond in.
@@ -308,14 +305,38 @@ class Moderation(commands.Cog):
     @commands.command(name="setchannel", help="Set which channel the bot should respond to. By default it responds to the same channel the command is used at")
     @commands.has_guild_permissions(administrator=True)     #Can be set to any other moderating permission
     async def set_response_channel(self, ctx, channel: commands.TextChannelConverter = None):
-        if channel is None:
-            channel = ctx.channel
-        
-        config = {"response_channel_id": channel.id}
-        with open("config.json", "w") as config_file:
-            json.dump(config, config_file, indent=4)
-        
-        await self.send_response(ctx, f"Response channel set to {channel.mention}")
+        try:
+            #load existing config
+            try:
+                with open("config.json", "r") as config_file:
+                    config = json.load(config_file)
+            except (FileNotFoundError, json.JSONDecodeError):
+                config = {}
+
+            #If no channel is provided, clear any stored ID if there is any
+            if channel is None:
+                if "response_channel_id" in config:
+                    config = {}
+                    with open("config.json", "w") as config_file:
+                        json.dump(config, config_file, indent=4)
+                    await u.send_response(self.bot, ctx, "Response channel cleared - I'll respond in whatever channel a command is issued")
+                else:
+                    await u.send_response(self.bot, ctx, "Response channel is already cleared.")
+            else:
+                config = {"response_channel_id": channel.id}
+                with open("config.json", "w") as config_file:
+                    json.dump(config, config_file, indent=4)
+
+                await u.send_response(self.bot, ctx, f"Response channel set to {channel.mention}")
+        except Exception as e:
+            await ctx.send(f"An error occured: {str(e)}")
+
+    #Rules function - Function to display rules in chat.
+    @commands.command(name="rules", help="Displays the rules of the server")
+    async def show_rules(self, ctx):
+        #change this to change the rules
+        rules_text = f"No rules to speak of - Just behave.\nif you're unsure just ask an officer or Doomstar"
+        await u.send_response(self.bot, ctx, rules_text)
 
 async def setup(bot):
     await bot.add_cog(Moderation(bot))
