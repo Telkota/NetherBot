@@ -34,7 +34,7 @@
         - Fetch a specific quote from the bot by using the ID of the quote
         - Admins/Mods can delete quotes either by ID or latest quote (default)
 
-If you see or encounter any bugs, report them here, to me at discord (Telkota).
+If you see or encounter any bugs, report them here or to me at discord (Telkota).
 
  *(For transparency sake: Made with liberal use of Google & Bing's Copilot after a few of months of casually learning Python and javascript.)*
 
