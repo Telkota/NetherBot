@@ -22,10 +22,10 @@ intents.voice_states = True
 
 class NetherBot(commands.Bot):
     def __init__(self):
-        super().__init__(command_prefix="!", intents=intents)
+        super().__init__(command_prefix="!", intents=intents, help_command=None)
     
     async def load_cogs(self):
-        cogs = ["commands.moderation", "commands.quotes", "commands.welcome", "commands.channel_manager"]
+        cogs = ["commands.moderation", "commands.quotes", "commands.welcome", "commands.channel_manager", "commands.help"]
         try:
             for cog in cogs:
                 await self.load_extension(cog)

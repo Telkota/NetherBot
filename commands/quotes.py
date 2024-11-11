@@ -37,7 +37,18 @@ class Quotes(commands.Cog):
         self.bot = bot
 
     #function to add quotes - a user can reply to a message they want to add as a quote, or write out their own quote
-    @commands.command(name="addquote", help="Add a quote to the database")
+    @commands.command(name="addquote", 
+                      help="Add a quote to the database",
+                      description="""Add a quote to the bot!
+                      See someone posting something fun? reply to the message with !addquote. 
+                      
+                      You could also add a quote directly into the bot by adding your quote after !addquote
+
+                      The bot will display the ID of a quote after it's created.
+                      
+                      No Permissions needed""",
+                      usage="",
+                      aliases=["aq", "quotethat"])
     async def add_quote(self, ctx, *, quote: str = None):
         #if nothing is provided and the message isn't replying to another message
         if ctx.message.reference is None and quote is None:
@@ -97,7 +108,15 @@ class Quotes(commands.Cog):
         await u.send_response(self.bot, ctx, f"Quote added!\nID: {new_quote['id']}")
 
     #function to fetch a random quote from the json file
-    @commands.command(name="rquote", help="Get a random quote")
+    @commands.command(name="rquote", 
+                      help="Get a random quote",
+                      description="""Fetch a random quote from the bot!
+                      If there is any quotes in the bot, the bot will give you a random quote.
+                      
+                      The bot will let you know if the quote database is empty.
+                      
+                      No Permissions needed""",
+                      aliases=["rq", "randomquote"])
     async def get_quote(self, ctx):
         try:
             with open("quotes.json", "r") as file:
@@ -112,7 +131,15 @@ class Quotes(commands.Cog):
             await u.send_response(self.bot, ctx, "No quotes available.")
     
     #function to delete a quote - Someone with the correct permissions can delete a quote.
-    @commands.command(name="delquote", help="Delete a quote. Either by ID, or by default the latest")
+    @commands.command(name="delquote", 
+                      help="Delete a quote. Either by ID, or by default the latest",
+                      description="""Allows a Moderator or Admin to delete a stored quote.
+                      By default it deletes the latest quote, but you can delete a quote by ID.
+                      
+                      Required Permissions:
+                      - Manage Messages""",
+                      usage="[id]",
+                      aliases=["dq", "deletequote"])
     @commands.has_permissions(manage_messages=True)   #change this to the desired permission. administrator=True or manage_message=True
     async def delete_quote(self, ctx, quote_id: str = None):
         try:
@@ -134,7 +161,14 @@ class Quotes(commands.Cog):
         except FileNotFoundError:
             await u.send_response(self.bot, ctx, "No quotes available to delete.")
     
-    @commands.command(name="quote", help="Get a quote based on its ID")
+    @commands.command(name="quote", 
+                      help="Get a quote based on its ID",
+                      description="""Fetch a quote based on its ID.
+                      Any user can make the bot post a specific quote by providing an ID.
+                      
+                      No Permissions needed""",
+                      usage="[id]",
+                      aliases=["q", "getquote", "gq"])
     async def get_quote_by_id(self, ctx, quote_id: str = None):
         if quote_id is None:
             await u.send_response(self.bot, ctx, "Please provide a quote ID.")

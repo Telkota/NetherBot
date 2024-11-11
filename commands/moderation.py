@@ -12,7 +12,15 @@ class Moderation(commands.Cog):
         self.bot = bot
     
     #Move all function - command to move all users to a specific voice channel
-    @commands.command(name="moveall", help="Move all members current connected to a voice channel into your specified channel")
+    @commands.command(name="moveall", 
+                      help="Move all users to one channel",
+                      description="""Command to move all users current connected to a voice channel to one specific channel.
+                      Handy for when there are users in different channels and you want to gather them all in one place.
+                      
+                      Required Permissions:
+                      - move members""",
+                      usage="[channel]",
+                      aliases=["ma", "raidtime"])
     @commands.has_guild_permissions(move_members=True)
     async def move_all(self, ctx, target_channel_name: str = None):
         #if no target parameter is entered, return an error message and quit.
@@ -49,7 +57,15 @@ class Moderation(commands.Cog):
             print(f"Error in move_all: {e}")
 
     #Move function - Moves a user to a specific channel
-    @commands.command(name="move", help="Move a member to a different voice channel")
+    @commands.command(name="move", 
+                      help="Move a member to a different voice channel",
+                      description="""Move a user to a different voice channel.
+                      Write in the user's name and target channel to move them!
+                      
+                      Required Permissions:
+                      - Move Members""",
+                      usage="[user] [target Channel]",
+                      aliases=["mo"])
     @commands.has_guild_permissions(move_members=True)
     async def move(self, ctx, member: discord.Member = None, target_channel_name: str = None):
         #if no target or member parameter is entered, return an error message and quit.
@@ -86,9 +102,20 @@ class Moderation(commands.Cog):
             print(f"Error in move: {e}")
     
     #kick function - Kicks a user with or without a reason
-    @commands.command(name="kick", help="Kick a member")
+    @commands.command(name="kick", 
+                      help="Kick a member",
+                      description="""Kick a user from your discord server.
+                      Remove any obnoxious user from the server (temporarly).
+                      The user could rejoin the server at any time.
+
+                      Reason can be left empty.
+                      
+                      Required Permissions:
+                      - Kick Members""",
+                      usage="[user] [reason]",
+                      aliases=["k", "ki"])
     @commands.has_guild_permissions(kick_members=True)
-    async def kick(self, ctx, member: discord.Member = None, *, reason=None):
+    async def kick(self, ctx, member: discord.Member = None, *, reason: str = None):
         #if no member paramter is entered, return an error message and quit.
         if member is None:
             await u.send_response(self.bot, ctx, "Error: You didn't input a user to kick.")
@@ -108,9 +135,19 @@ class Moderation(commands.Cog):
             print(f"Error in kick: {e}")
 
     #ban function - Bans a user with or without a reason
-    @commands.command(name="ban", help="Ban a member")
+    @commands.command(name="ban", 
+                      help="Ban a member",
+                      description="""Ban a user from your server.
+                      The user won't be able to rejoin your server until someone has gone in and manually unbanned them
+                      
+                      Reason can be left empty.
+
+                      Required Permissions:
+                      - Ban Members""",
+                      usage="[user] [reason]",
+                      aliases=["b", "bop"])
     @commands.has_guild_permissions(ban_members=True)
-    async def ban(self, ctx, member: discord.Member = None, *, reason=None):
+    async def ban(self, ctx, member: discord.Member = None, *, reason: str = None):
         #if no member paramter is entered, return an error message and quit.
         if member is None:
             await u.send_response(self.bot, ctx, "Error: You didn't input a user to ban.")
@@ -130,7 +167,13 @@ class Moderation(commands.Cog):
             print(f"Error in ban: {e}")
 
     #Mute function - Mutes a user if they are in a voice channel
-    @commands.command(name="mute", help="Mute a member in voice")
+    @commands.command(name="mute", 
+                      help="Mute a member in voice",
+                      description="""Mute a user in voice so they can't speak until unmuted
+
+                      Required Permissions:
+                      - Mute Members""",
+                      usage="[user]")
     @commands.has_guild_permissions(mute_members=True)
     async def mute(self, ctx, member: discord.Member = None):
         #if no member paramter is entered, return an error message and quit.
@@ -156,7 +199,13 @@ class Moderation(commands.Cog):
             print(f"Error in mute: {e}")
     
     #Deafen function - Deafens a user if they are in a voice channel.
-    @commands.command(name="deafen", help="Deafen a member in voice")
+    @commands.command(name="deafen", 
+                      help="Deafen a member in voice",
+                      description="""Deafens a user, leaving them unable to hear others until undeafened
+                      
+                      Required Permissions:
+                      - Deafen Members""",
+                      usage="[user]")
     @commands.has_guild_permissions(deafen_members=True)
     async def deafen(self, ctx, member: discord.Member = None):
         #if no member paramter is entered, return an error message and quit.
@@ -182,7 +231,14 @@ class Moderation(commands.Cog):
             print(f"Error in deafen: {e}")
     
     #unmute function - Unmute a user
-    @commands.command(name="unmute", help="Unmute a member in voice")
+    @commands.command(name="unmute", 
+                      help="Unmute a member in voice",
+                      description="""Unmutes a user so they can speak once again.
+                      
+                      Required Permissions:
+                      - Mute Members""",
+                      usage="[user]",
+                      aliases=["um"])
     @commands.has_guild_permissions(mute_members=True)
     async def unmute(self, ctx, member: discord.Member = None):
         #if no member paramter is entered, return an error message and quit.
@@ -204,7 +260,14 @@ class Moderation(commands.Cog):
             print(f"Error in unmute: {e}")
     
     #Undeafen function - Undeafens a user
-    @commands.command(name="undeafen", help="Undeafen a member in voice")
+    @commands.command(name="undeafen", 
+                      help="Undeafen a member in voice",
+                      description="""Undeafens a user so they can hear others once again.
+                      
+                      Required Permissions:
+                      - Deafen Members""",
+                      usage="[user]",
+                      aliases=["ud"])
     @commands.has_guild_permissions(deafen_members=True)
     async def undeafen(self, ctx, member: discord.Member = None):
         #if no member paramter is entered, return an error message and quit.
@@ -226,9 +289,17 @@ class Moderation(commands.Cog):
             print(f"Error in undeafen: {e}")
     
     #silence function - Mutes and deafens a user if they are in voice
-    @commands.command(name="silence", help="Mutes and Deafens a member in voice.")
-    @commands.has_guild_permissions(deafen_members=True)
-    @commands.has_guild_permissions(mute_members=True)
+    @commands.command(name="silence", 
+                      help="Mutes and Deafens a member in voice.",
+                      description="""Mutes and Deafens a user in voice. 
+                      Enjoy the silence!
+                      
+                      Required Permissions:
+                      - Deafen Members
+                      - Mute Members""",
+                      usage="[user]",
+                      aliases=["sil"])
+    @commands.has_guild_permissions(deafen_members=True, mute_members=True)
     async def silence(self, ctx, member: discord.Member = None):
         #if no member paramter is entered, return an error message and quit.
         if member is None:
@@ -266,9 +337,17 @@ class Moderation(commands.Cog):
             print(f"Error in silence: {e}")
     
     #unsilence function - Unmutes and undeafens a user
-    @commands.command(name="unsilence", help="Unmutes and Undeafens a member in voice")
-    @commands.has_guild_permissions(deafen_members=True)
-    @commands.has_guild_permissions(mute_members=True)
+    @commands.command(name="unsilence", 
+                      help="Unmutes and Undeafens a member in voice",
+                      description="""Unmutes and undeafens a user. 
+                      if you feel like a user has been silent for too long.
+                      
+                      Required Permissions:
+                      - Deafen Members
+                      - Mute Members""",
+                      usage="[user]",
+                      aliases=["usil", "unsil", "us"])
+    @commands.has_guild_permissions(deafen_members=True, mute_members=True)
     async def unsilence(self, ctx, member: discord.Member = None):
         #if no member paramter is entered, return an error message and quit.
         if member is None:
@@ -302,8 +381,20 @@ class Moderation(commands.Cog):
     
     #Set response channel - Function to let admins/moderators set a channel for the bot to respond in.
     #One way to contain the bot messages to one place rather than it replying in every channel.
-    @commands.command(name="setchannel", help="Set which channel the bot should respond to. By default it responds to the same channel the command is used at")
-    @commands.has_guild_permissions(administrator=True)     #Can be set to any other moderating permission
+    @commands.command(name="setchannel", 
+                      help="Set which channel the bot should respond to.",
+                      description="""Set the channel the bot should respond in.
+                      By default the bot will respond in the channel a command is sent in.
+                      If you change the channel, the bot will ping the user that issued the command.*
+                      
+                      However, if the user can't see the channel in question, the bot will respond in the same channel the command was issued.
+                      if you want to clear the channel the bot responds in, just send the command without any arguments
+                      
+                      Required Permissions:
+                      - Administrator""",
+                      usage="[channel]",
+                      aliases=["respondhere", "sc"])
+    @commands.has_guild_permissions(administrator=True)     #Can be set to any other moderating permission. Remember to change description.
     async def set_response_channel(self, ctx, channel: commands.TextChannelConverter = None):
         try:
             #load existing config
@@ -332,7 +423,13 @@ class Moderation(commands.Cog):
             await ctx.send(f"An error occured: {str(e)}")
 
     #Rules function - Function to display rules in chat.
-    @commands.command(name="rules", help="Displays the rules of the server")
+    @commands.command(name="rules", 
+                      help="Displays the rules of the server",
+                      description="""Display the rules of the server.
+                      Rules must be changed in code.
+                      I should probably change that sometime to allow moderators/admins to change the rules...
+                      
+                      No Permissions needed""")
     async def show_rules(self, ctx):
         #change this to change the rules
         rules_text = f"No rules to speak of - Just behave.\nif you're unsure just ask an officer or Doomstar"

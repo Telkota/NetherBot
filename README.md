@@ -6,9 +6,48 @@
  There probably will be bugs to iron out, and code might be messy and/or confusing.
  I'm not really a confident coder yet and still learning along the way.
 
+Features:
+    - Moderation tools
+        - Ban users
+        - Kick users
+        - Mute/Unmute users
+        - Deafen/Undeafen users
+        - Move a user to a different voice channel
+        - Move all users to a specific voice channel
+        - Set response channel for the bot (default is the same channel as the command)
+        - Silence/Unsilence users (Mutes & Deafens)
+        - Display Server Rules (TODO: Add function to let admins/mods add new rules with a command)
+    
+    - Channel Management
+        - Create new channels (voice and text)
+        - Delete Channels
+        - Delete recent messages* (Some restrictions apply - check !help delmessages)
+    
+    - Quotes
+        - Reply to a message with !addquote (or an alias) to add the quote to the bot.
+        - User can also enter a quote into the bot wiht !addquote <text>
+        - Fetch random quote from the bot
+        - Fetch a specific quote from the bot by using the ID of the quote
+        - Admins/Mods can delete quotes either by ID or latest quote (default)
+
+
  Report any bug to Telkota @ Discord or in the Nether Vortex discord server.
 
-Var 0.3.5 - 10/11/24:
+ (Made with liberal use of Google & Bing's Copilot after a few of months of casually learning Python and javascript.)
+
+Ver 1.0 - 11/11/24:
+- first full version complete
+- Added custom help command
+- Cleaned up 
+
+Ver 0.4 - 10/11/24:
+- Added Channel Management capabilities.
+    - Only available to users with certain permissions
+    - Create new channels (text or voice)
+    - Delete channels
+    - Delete messages
+
+Ver 0.3.5 - 10/11/24:
 - Reformatted how the quote is presented
 - Simplified the unique IDs for quotes
 
@@ -16,7 +55,7 @@ Ver 0.3 - 08-09/nov/24:
 - Added quote capabilities.
     - users can add quotes either by replying to a message or writing something to quote
     - users can fetch a random quote or a specific quote by ID
-    - moderators/admins can delete quotes based on ID
+    - moderators/Admins can delete quotes based on ID
 
 Ver 0.2 - 08/nov/24 :
 - Added moderation capabilities

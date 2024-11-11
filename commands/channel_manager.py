@@ -2,12 +2,21 @@ import commands.utils as u
 import discord
 from discord.ext import commands
 
-class ChannelManagement(commands.Cog):
+class Channel_Management(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
 
     #Function to create new channels. 
-    @commands.command(name="createchannel", help="Create a new text or voice channel")
+    @commands.command(name="createchannel", 
+                      help="Create a new text or voice channel",
+                      description="""Command to create new text or voice channels, and what category (if any) you want them under. 
+                      
+                      Category name can be left empty if you don't want the channel to be under a category.
+
+                      Permissions required:
+                      - Manage Channels""",
+                      usage="[channel name] [text/voice] [category name]",
+                      aliases=["newchannel", "channelcreate"])
     @commands.has_guild_permissions(manage_channels=True)
     async def create_channel(self, ctx, channel_name: str = None, type: str = "text", category: str = None):
         guild = ctx.guild
@@ -57,7 +66,20 @@ class ChannelManagement(commands.Cog):
             await u.send_response(self.bot, ctx, f"Text channel {new_channel} created.")
 
     #Function to delete channels - With confirmation safeguard
-    @commands.command(name="delchannel", help="Delete a channel")
+    @commands.command(name="delchannel", 
+                      help="Delete one or more channel(s)",
+                      description="""Command to delete one or more channels in your server.
+                      You can input any number of channels that exists - Just separate the channels with space.
+                      (i.e !delchannel channel1 channel2 channel3)
+
+                      You will have to confirm that you want to delete the channel(s).
+
+                      if a category is left without any servers, this command will automatically delete the category as well.
+                      
+                      Required Permissions:
+                      - Manage Channels""",
+                      usage="[channel]",
+                      aliases=["removechannel", "deletechannel", "delc"])
     @commands.has_guild_permissions(manage_channels=True)
     async def delete_channel(self, ctx, *channels: discord.abc.GuildChannel):
         def check(msg):
@@ -96,13 +118,29 @@ class ChannelManagement(commands.Cog):
 
     #Function to delete messages - With confirmation safeguard. 
     #Some limits apply: only up to 100 messages due to API limitations, and only messages within the last 14 days.
-    @commands.command(name="delmessages", help="Deletes the x most recent messages*")
+    @commands.command(name="delmessages", 
+                      help="Deletes the x most recent messages*",
+                      description="""Deletes the x number of recent messages, with some limitations.
+                      Due to API limitations, I can only delete up to 100 messages, and the messages can't be more than 14 days old.
+                      
+                      Keep those limitations in mind when using this command. Best use might be 50 or less at a time.
+
+                      You will have to confirm if you want to delete the message(s).
+                      
+                      Required Permissions:
+                      - Manage Messages""",
+                      usage="[amount]",
+                      aliases=["del", "messagedeletion", "purge"])
     @commands.has_guild_permissions(manage_messages=True)
     async def delete_messages(self, ctx, amount: int):
         if amount < 1:
             await u.send_response(f"Please specify a valid number of messages to delete within {ctx.channel}")
             return
         
+        if amount > 100:
+            await u.send_response(f"Sorry, I cannot delete that many messages at once.")
+            return
+
         #Confirmation function like in the above function
         def check(msg):
             return msg.author == ctx.author and msg.channel == ctx.channel and msg.content.lower() in ["y", "n"]
@@ -129,15 +167,19 @@ class ChannelManagement(commands.Cog):
                 await u.send_response(self.bot, ctx, f"Deleted {len(deleted)} messages. This message will be removed in 10 seconds", delete_after=10)
             else:
                 await u.send_response(self.bot, ctx, "Message deletion cancelled.")
+        #error handling for difference scenarios
         except discord.errors.NotFound:
             await u.send_response(self.bot, ctx, "One of the messages was not found, operation cancelled.")
         except discord.errors.Forbidden:
             await u.send_response(self.bot, ctx, "I don't have permission to delete messages here.")
         except discord.errors.HTTPException as e:
             await u.send_response(self.bot, ctx, f"An error occurred: {e}")
+        except commands.CommandInvokeError as e:
+            await u.send_response(self.bot, ctx, f"An error occurred: {e}")
         except TimeoutError:
             await u.send_response(self.bot, ctx, "Time's up - Message deletion cancelled.")
+        except Exception as e:
+            await u.send_response(self.bot, ctx, f"An unexpected error occurred: {e}")
         
-
 async def setup(bot):
-    await bot.add_cog(ChannelManagement(bot))
+    await bot.add_cog(Channel_Management(bot))

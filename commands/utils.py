@@ -1,4 +1,5 @@
 import json
+import discord
 
 #Utility script. fetches the response channel id from the config file if it has been set
 def get_response_channel(bot):
@@ -21,14 +22,17 @@ async def send_response(bot, ctx, message, delete_after=None):
         if response_channel is None or not response_channel.permissions_for(ctx.author).read_messages:
             response_channel = ctx.channel
 
-        #Don't mention the user if the command is sent in the same channel as the response channel
-        if response_channel.id == ctx.channel.id:
-            sent_message = await response_channel.send(message, delete_after=delete_after)
+        #Check if the message is an embed
+        if isinstance(message, discord.Embed):
+            sent_message = await response_channel.send(embed=message, delete_after=delete_after)
         else:
-            user_mention = ctx.author.mention
-            sent_message = await response_channel.send(f"{user_mention} - {message}", delete_after=delete_after)
+            #check whether the response channel is the same as the channel the command is sent in
+            user_mention = ctx.author.mention if response_channel.id != ctx.channel.id else ""
+            sent_message = await response_channel.send(f"{message} {user_mention}", delete_after=delete_after)
+
         #return sent_message statement to make delete_messages work (channel_manager.py)
         return sent_message
+    
     except Exception as e:
         await ctx.channel.send(f"An error occured while sending the response. {e}")
         return None
