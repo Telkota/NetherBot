@@ -3,7 +3,7 @@ import discord
 import logging
 import traceback
 import asyncio
-from commands.utils import get_response_channel
+import commands.utils as u
 from discord.ext import commands
 from dotenv import load_dotenv
 
@@ -42,27 +42,20 @@ class NetherBot(commands.Bot):
         for guild in self.guilds:
             print(f"server name: {guild.name} (id: {guild.id})")
 
-    #Error Responsing
-    async def send_error_response(self, ctx, message):
-        response_channel = get_response_channel(self)
-        if response_channel is None:
-            response_channel = ctx.channel
-        await response_channel.send(message)
-
     #Error Handling
     async def on_command_error(self, ctx, error):
         if isinstance(error, commands.CommandNotFound):
-            await self.send_error_response(ctx, f"Invalid command. Please check the command and try again.\n"
+            await u.send_response(self, ctx, f"Invalid command. Please check the command and try again.\n"
                                                  "If you don't know what commands I have you can check out `!help` to get a list of commands")
         elif isinstance(error, commands.MissingPermissions):
-            await self.send_error_response(ctx, "You don't have the required permissions to run this command. ")
+            await u.send_response(self, ctx, "You don't have the required permissions to run this command. ")
         else:
             #Log the error details in the console
             logging.error(f"An error occured: {error}")
             traceback.print_exception(type(error), error, error.__traceback__)
             
             #Send an error message in Discord
-            await self.send_error_response(ctx, f"An error occurred while processing the command:\n"
+            await u.send_response(self, ctx, f"An error occurred while processing the command:\n"
                         f"{error}")
 
 async def main():
