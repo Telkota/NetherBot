@@ -3,7 +3,7 @@
  The bot is only really intended to be used in our server.
 
  This is a hobby project done by Telkota.
- It's done so I can get some more experience in coding, and have something to show off.
+ I wanted more experience in coding/programming, and at the same time maybe have something to show off. 
 
  *As such I haven't really set up any licensing on it, along with it being a project made by a newbie so this project probably ain't the best resource to take from either.*
  
