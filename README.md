@@ -1,12 +1,17 @@
 # NetherBot
- Repo for NetherBot, a discord bot written for Nether Vortex, a WoW guild on Draenor-EU.
+ Repo for NetherBot, a discord bot written for Nether Vortex.
+ The bot is only really intended to be used in our server.
 
  This is a hobby project done by Telkota.
  It's done so I can get some more experience in coding, and have something to show off.
- There probably will be bugs to iron out, and code might be messy and/or confusing.
+
+ *As such I haven't really set up any licensing on it, along with it being a project made by a newbie so this project probably ain't the best resource to take from either.*
+ 
+ There's probably some bugs to iron out, and code might be messy and/or confusing.
  I'm not really a confident coder yet and still learning along the way.
 
-Features:
+ ## Features:
+```
     - Moderation tools
         - Ban users
         - Kick users
@@ -29,16 +34,18 @@ Features:
         - Fetch random quote from the bot
         - Fetch a specific quote from the bot by using the ID of the quote
         - Admins/Mods can delete quotes either by ID or latest quote (default)
+```
 
+If you see or encounter any bugs, report them here, to me at discord (Telkota).
 
- Report any bug to Telkota @ Discord or in the Nether Vortex discord server.
+ *(For transparency sake: Made with liberal use of Google & Bing's Copilot after a few of months of casually learning Python and javascript.)*
 
- (Made with liberal use of Google & Bing's Copilot after a few of months of casually learning Python and javascript.)
+## Versions: 
 
 Ver 1.0 - 11/11/24:
 - first full version complete
 - Added custom help command
-- Cleaned up 
+- Cleaned up the code a bit
 
 Ver 0.4 - 10/11/24:
 - Added Channel Management capabilities.
@@ -69,4 +76,3 @@ Ver 0.2 - 08/nov/24 :
  Ver 0.1 - 07/nov/24 :
  - Made sure the bot can connect to discord. 
  - Welcome message.
- - Basic error handling.
