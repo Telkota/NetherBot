@@ -11,7 +11,6 @@
  I'm not really a confident coder yet and still learning along the way.
 
  ## Features:
-```
     - Moderation tools
         - Ban users
         - Kick users
@@ -34,7 +33,6 @@
         - Fetch random quote from the bot
         - Fetch a specific quote from the bot by using the ID of the quote
         - Admins/Mods can delete quotes either by ID or latest quote (default)
-```
 
 If you see or encounter any bugs, report them here, to me at discord (Telkota).
 
@@ -42,19 +40,19 @@ If you see or encounter any bugs, report them here, to me at discord (Telkota).
 
 ## Versions: 
 
-Ver 1.0 - 11/11/24:
-- first full version complete
+Ver 1.0 - 11/nov/24:
+- First full version complete
 - Added custom help command
 - Cleaned up the code a bit
 
-Ver 0.4 - 10/11/24:
+Ver 0.4 - 10/nov/24:
 - Added Channel Management capabilities.
     - Only available to users with certain permissions
     - Create new channels (text or voice)
     - Delete channels
     - Delete messages
 
-Ver 0.3.5 - 10/11/24:
+Ver 0.3.5 - 10/nov/24:
 - Reformatted how the quote is presented
 - Simplified the unique IDs for quotes
 
