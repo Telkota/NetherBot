@@ -7,11 +7,23 @@ import utility.utils as u
 from utility.cog_loader import load_cogs
 from discord.ext import commands
 from dotenv import load_dotenv
+from datetime import datetime
 
 #setup logging
-logging.basicConfig(level=logging.INFO)
+base_directory = os.path.dirname(os.path.abspath(__file__))
+logs_directory = os.path.join(base_directory, "logs")
+os.makedirs(logs_directory, exist_ok=True)
+log_filename = os.path.join(logs_directory, f"bot_{datetime.now().strftime('%d-%m-%Y_%H-%M')}.log")
+logging.basicConfig(
+    level=logging.INFO,
+    format="%(asctime)s - %(name)s - %(levelname)s - %(message)s",
+    datefmt="%H:%M",
+    handlers=[
+        logging.FileHandler(log_filename),  #log to a file named with the current date of when the bot started up
+        logging.StreamHandler()             #Log to the console as well
+    ])
 
-#grab token from .env file
+#grab stuff from .env file
 load_dotenv()
 TOKEN = os.getenv("DISCORD_TOKEN")
 OWNER_ID = os.getenv("OWNER_ID")
