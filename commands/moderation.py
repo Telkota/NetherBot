@@ -431,16 +431,23 @@ class Moderation(commands.Cog):
                       
                       No Permissions needed""")
     async def show_rules(self, ctx):
-        #change this to change the rules
-        rules_text = f"No rules to speak of - Just behave.\nif you're unsure just ask an officer or Doomstar"
-        await u.send_response(self.bot, ctx, rules_text)
+        #load up config to retreive rules.
+        try:
+            with open("config.json", "r") as file:
+                config = json.load(file)
+        except (FileNotFoundError, json.JSONDecodeError):
+            config = {"rules": "No rules to speak of - Just behave.\nAsk a moderator or admin if you're unsure about something."}
+
+        await u.send_response(self.bot, ctx, config["rules"])
 
     @commands.command(name="setgreeting",
                       help="Sets welcome message",
                       description="""Allows someone with the proper permissions to change the bot's welcome message.
-                      
+                      You can leave the message empty if you only use the command on its' own - The bot will confirm if you wish to do so.
+
                       Required Permissions:
-                      - Manage Messages""", 
+                      - Manage Messages""",
+                      usage="[new message]",
                       aliases=["setmsg", "setwelcome", "greeting", "welcome"])
     @commands.has_guild_permissions(manage_messages=True)    #set permissions to administrator or manage_messages depending on who should be able to change the message
     async def set_greeting(self, ctx, msg: str = None):
@@ -455,23 +462,28 @@ class Moderation(commands.Cog):
         def check(msg):
             return msg.author == ctx.author and msg.channel == ctx.channel and msg.content.lower() in ["y", "n"]
         
-        await u.send_response(f"Do you want to set the welcome message to be empty?\nReply with a 'Y' for yes or any other input to cancel")
-        try:
-            response = await self.bot.wait_for('message', check=check, timeout=30.0)
-            if response.content.lower() == "y":
-                config["empty_message"] = True
-                with open("config.json", "w") as file:
-                    json.dump(config, file)
-                await u.send_response(self.bot, ctx, f"Welcome message set to be empty.\nI'll only welcome users with: Welcome to {ctx.guild.name}, <new user>!")
+        if msg is None:
+
+            await u.send_response(f"Do you want to set the welcome message to be empty?\nReply with a 'Y' for yes or any other input to cancel")
+            try:
+                response = await self.bot.wait_for('message', check=check, timeout=30.0)
+                if response.content.lower() == "y":
+                    config["empty_message"] = True
+                    config["welcome_message"] = ""      #Save an empty string to wipe any previous message.
+                    with open("config.json", "w") as file:
+                        json.dump(config, file)
+                    await u.send_response(self.bot, ctx, f"Welcome message set to be empty.\nI'll only welcome users with: Welcome to {ctx.guild.name}, <new user>!")
+                    return
+                else: 
+                    await u.send_response(self.bot, ctx, "Interaction cancelled - No new welcome message saved.")
+            except TimeoutError:
+                await u.send_response(self.bot, ctx, "Time's up - No new welcome message saved.")
                 return
-            else: 
-                await u.send_response(self.bot, ctx, "Interaction cancelled - No new welcome message saved.")
-        except TimeoutError:
-            await u.send_response(self.bot, ctx, "Time's up - No new welcome message saved.")
-            return
         
         #If a message is provided, save it to the config variable and save it to the file.
+        #strip any leading or trailing whitespace before saving it
 
+        msg = msg.strip()
         config["welcome_message"] = msg
         config["empty_message"] = False
 
@@ -482,6 +494,42 @@ class Moderation(commands.Cog):
                               f"""Welcome message updated succesfully!
                               I'll now display this message when a new user joins the server:
                               Welcome to {ctx.guild.name}, <new user>!
+                              {msg}""")
+
+    @commands.command(name="setrules",
+                      help="Set the rules for the server",
+                      description="""Allows someone with the correct permissions to set up new rules that are displayed with !rules 
+                      
+                      Required Permissions:
+                      - Manage Messages""",
+                      usage="[new rules]")
+    @commands.has_guild_permissions(manage_messages=True)
+    async def new_rules(self, ctx, msg: str = None):
+        #Load up the config file
+        try:
+            with open("config.json", "r") as file:
+                config = json.load(file)
+        except (FileNotFoundError, json.JSONDecodeError):
+            config = {}
+
+        #check to see if message is empty
+        if msg is None:
+            config["rules"] = f"No rules to speak of - Just behave.\nAsk a moderator or admin if you're unsure about something."
+            with open("config.json", "w") as file:
+                json.dump(config, file)
+            await u.send_response(self.bot, ctx, 
+                                  """Rules set to be generic:
+                                  No rules to speak of - Just behave.
+                                  just ask a moderator or admin if you're unsure about something.""")
+            return
+        
+        #strip any white space.
+        msg = msg.strip()
+        config["rules"] = msg
+        with open("config.json", "w") as file:
+            json.dump(config, file)
+        await u.send_response(self.bot, ctx, 
+                              f"""Rules updated succesfully! Here's the new rules you've set:
                               {msg}""")
 
 async def setup(bot):
