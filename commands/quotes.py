@@ -1,7 +1,7 @@
 import json
 import random
 import re
-import commands.utils as u
+import utility.utils as u
 from datetime import datetime
 from discord.ext import commands
 

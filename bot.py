@@ -3,7 +3,8 @@ import discord
 import logging
 import traceback
 import asyncio
-import commands.utils as u
+import utility.utils as u
+from utility.cog_loader import load_cogs
 from discord.ext import commands
 from dotenv import load_dotenv
 
@@ -25,21 +26,10 @@ class NetherBot(commands.Bot):
     def __init__(self):
         super().__init__(command_prefix="!", intents=intents, help_command=None)
         self.owner_id = OWNER_ID
-    
-    async def load_cogs(self):
-        cogs = ["commands.moderation", "commands.quotes", "commands.welcome", "commands.channel_manager", "commands.help"]
-        try:
-            for cog in cogs:
-                await self.load_extension(cog)
-                logging.info(f"{cog} loaded succesfully")
-        except Exception as e:
-            logging.error(f"Error in loading cogs: {e}")
-        
-        if self.owner_id is None:
-            logging.warning("Owner ID is not set.")
 
+    #initial setup of commands
     async def setup_hook(self):
-        await self.load_cogs()
+        await load_cogs(self)
     
     async def on_ready(self):
         logging.info(f"Logged in as {self.user.name}")
@@ -62,25 +52,6 @@ class NetherBot(commands.Bot):
             #Send an error message in Discord
             await u.send_response(self, ctx, f"An error occurred while processing the command:\n"
                         f"{error}")
-
-    #Command to reload cogs for updating the bot without having to shut down the bot.
-    @commands.command(name="reload", 
-                      description="""Command to refresh the bot's scripts.
-                      
-                      Required Permissions:
-                      - Administrator
-                      (command available to bot writer regardless of permissions)
-                      """)
-    async def reload(self, ctx):
-        logging.info(f"Reload command invoked by {ctx.author.name}")
-        #Check to see if the user is the bot developer or has administrator permissions
-        if ctx.author.id == self.owner_id or ctx.author.guild_permissions.administrator:
-            logging.info("Permission check passed - Reloading cogs...")
-            await self.load_cogs()
-            await u.send_response(self.bot, ctx, "Cogs reloaded successfully.")
-        else:
-            logging.warning("Permission check failed.")
-            await u.send_response(self.bot, ctx, "You don't have permissions to refresh the bot.")
 
 
 async def main():

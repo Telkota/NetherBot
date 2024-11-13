@@ -1,5 +1,5 @@
 from discord.ext import commands
-import commands.utils as u
+import utility.utils as u
 import discord
 import json
 import logging
@@ -530,5 +530,6 @@ class Moderation(commands.Cog):
                               f"""Rules updated succesfully! Here's the new rules you've set:
                               {msg}""")
 
+    
 async def setup(bot):
     await bot.add_cog(Moderation(bot))

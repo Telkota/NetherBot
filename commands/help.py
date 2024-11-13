@@ -1,6 +1,6 @@
 import discord
 from discord.ext import commands
-import commands.utils as u
+import utility.utils as u
 
 #Mapping for more user-friendly type names
 type_names = {
