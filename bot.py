@@ -72,11 +72,14 @@ class NetherBot(commands.Bot):
                       (command available to bot writer regardless of permissions)
                       """)
     async def reload(self, ctx):
+        logging.info(f"Reload command invoked by {ctx.author.name}")
         #Check to see if the user is the bot developer or has administrator permissions
         if ctx.author.id == self.owner_id or ctx.author.guild_permissions.administrator:
+            logging.info("Permission check passed - Reloading cogs...")
             await self.load_cogs()
             await u.send_response(self.bot, ctx, "Cogs reloaded successfully.")
         else:
+            logging.warning("Permission check failed.")
             await u.send_response(self.bot, ctx, "You don't have permissions to refresh the bot.")
 
 
