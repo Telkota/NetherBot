@@ -1,6 +1,7 @@
 # NetherBot
  Repo for NetherBot, a discord bot written for Nether Vortex.
- The bot is only really intended to be used in our server.
+ The bot is only really intended to be used in our server. 
+ It's not intended to be used on several servers at once - Configs aren't set up to handle multiple servers.
 
  This is a hobby project done by Telkota.
  I wanted more experience in coding/programming, and at the same time maybe have something to show off. 
