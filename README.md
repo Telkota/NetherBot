@@ -40,6 +40,16 @@ If you see or encounter any bugs, report them here or to me at discord (Telkota)
 
 ## Versions: 
 
+Ver 1.1 - 13/nov/24
+- Added functions to let moderators/admins to change Welcome message and rules
+    - Welcome message will always contain a message of "Welcome to <server name>, <new user>!"
+    - You can change the welcome message with !setgreeting (or an alias)
+    - You can set new rules with !setrules
+    - By default it will display a generic rules message. if you only do !setrules it will go back to the default generic rules message.
+- Added function to refresh the bot's scripts.
+    - Mostly for development purposes. Allows me to update the bot without shutting it down
+        - (unless there is changes to the main bot script)
+
 Ver 1.0 - 11/nov/24:
 - First full version complete
 - Added custom help command
