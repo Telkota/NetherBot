@@ -1,6 +1,7 @@
-#Ignore config and quote file
+#Ignore config, logs and quote file
 config.json
 quotes.json
+logs/
 
 # Byte-compiled / optimized / DLL files
 __pycache__/

@@ -2,7 +2,10 @@ import logging
 import os
 from discord.ext import commands
 
-async def load_cogs(bot: commands.Bot, cog_file: str = "utility/cogs.list"):
+async def load_cogs(bot: commands.Bot, cog_file: str = None):
+    if cog_file is None:
+        base_directory = os.path.dirname(os.path.abspath(__file__))
+        cog_file = os.path.join(base_directory, "cogs.list")
     try:
         #read the cogs from the cogs file
         with open(cog_file, "r") as file:
