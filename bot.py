@@ -58,6 +58,23 @@ class NetherBot(commands.Bot):
             await u.send_response(self, ctx, f"An error occurred while processing the command:\n"
                         f"{error}")
 
+    #Command to reload cogs for updating the bot without having to shut down the bot.
+    @commands.command(name="reload", 
+                      description="""Command to refresh the bot's scripts.
+                      
+                      Required Permissions:
+                      - Administrator
+                      (command available to bot writer regardless of permissions)
+                      """)
+    async def reload(self, ctx):
+        #Check to see if the user is the bot developer or has administrator permissions
+        if ctx.author.id == self.owner_id or ctx.author.guild_permissions.administrator:
+            await self.load_cogs()
+            await u.send_response(self.bot, ctx, "Cogs reloaded successfully.")
+        else:
+            await u.send_response(self.bot, ctx, "You don't have permissions to refresh the bot.")
+
+
 async def main():
     bot = NetherBot()
 
