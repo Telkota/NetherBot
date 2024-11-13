@@ -13,6 +13,7 @@ logging.basicConfig(level=logging.INFO)
 #grab token from .env file
 load_dotenv()
 TOKEN = os.getenv("DISCORD_TOKEN")
+OWNER_ID = os.getenv("OWNER_ID")
 
 # bot needs message and members intents in the developer portal
 intents = discord.Intents.default()
@@ -23,6 +24,7 @@ intents.voice_states = True
 class NetherBot(commands.Bot):
     def __init__(self):
         super().__init__(command_prefix="!", intents=intents, help_command=None)
+        self.owner_id = OWNER_ID
     
     async def load_cogs(self):
         cogs = ["commands.moderation", "commands.quotes", "commands.welcome", "commands.channel_manager", "commands.help"]
@@ -32,6 +34,9 @@ class NetherBot(commands.Bot):
                 logging.info(f"{cog} loaded succesfully")
         except Exception as e:
             logging.error(f"Error in loading cogs: {e}")
+        
+        if self.owner_id is None:
+            logging.warning("Owner ID is not set.")
 
     async def setup_hook(self):
         await self.load_cogs()
