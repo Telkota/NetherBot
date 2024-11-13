@@ -426,8 +426,6 @@ class Moderation(commands.Cog):
     @commands.command(name="rules", 
                       help="Displays the rules of the server",
                       description="""Display the rules of the server.
-                      Rules must be changed in code.
-                      I should probably change that sometime to allow moderators/admins to change the rules...
                       
                       No Permissions needed""")
     async def show_rules(self, ctx):

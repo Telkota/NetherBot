@@ -20,7 +20,9 @@
         - Move all users to a specific voice channel
         - Set response channel for the bot (default is the same channel as the command)
         - Silence/Unsilence users (Mutes & Deafens)
-        - Display Server Rules (TODO: Add function to let admins/mods add new rules with a command)
+        - Display Server Rules
+        - Modify the Server Rules message
+        - Modify the welcome message
     
     - Channel Management
         - Create new channels (voice and text)
