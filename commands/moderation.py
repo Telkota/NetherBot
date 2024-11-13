@@ -435,5 +435,54 @@ class Moderation(commands.Cog):
         rules_text = f"No rules to speak of - Just behave.\nif you're unsure just ask an officer or Doomstar"
         await u.send_response(self.bot, ctx, rules_text)
 
+    @commands.command(name="setgreeting",
+                      help="Sets welcome message",
+                      description="""Allows someone with the proper permissions to change the bot's welcome message.
+                      
+                      Required Permissions:
+                      - Manage Messages""", 
+                      aliases=["setmsg", "setwelcome", "greeting", "welcome"])
+    @commands.has_guild_permissions(manage_messages=True)    #set permissions to administrator or manage_messages depending on who should be able to change the message
+    async def set_greeting(self, ctx, msg: str = None):
+        #Load up the config file
+        try:
+            with open("config.json", "r") as file:
+                config = json.load(file)
+        except (FileNotFoundError, json.JSONDecodeError):
+            config = {}
+            
+        #check function for if the message is empty
+        def check(msg):
+            return msg.author == ctx.author and msg.channel == ctx.channel and msg.content.lower() in ["y", "n"]
+        
+        await u.send_response(f"Do you want to set the welcome message to be empty?\nReply with a 'Y' for yes or any other input to cancel")
+        try:
+            response = await self.bot.wait_for('message', check=check, timeout=30.0)
+            if response.content.lower() == "y":
+                config["empty_message"] = True
+                with open("config.json", "w") as file:
+                    json.dump(config, file)
+                await u.send_response(self.bot, ctx, f"Welcome message set to be empty.\nI'll only welcome users with: Welcome to {ctx.guild.name}, <new user>!")
+                return
+            else: 
+                await u.send_response(self.bot, ctx, "Interaction cancelled - No new welcome message saved.")
+        except TimeoutError:
+            await u.send_response(self.bot, ctx, "Time's up - No new welcome message saved.")
+            return
+        
+        #If a message is provided, save it to the config variable and save it to the file.
+
+        config["welcome_message"] = msg
+        config["empty_message"] = False
+
+        with open("config.json", "w") as file:
+            json.dump(config, file)
+
+        await u.send_response(self.bot, ctx, 
+                              f"""Welcome message updated succesfully!
+                              I'll now display this message when a new user joins the server:
+                              Welcome to {ctx.guild.name}, <new user>!
+                              {msg}""")
+
 async def setup(bot):
     await bot.add_cog(Moderation(bot))
