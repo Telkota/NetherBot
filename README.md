@@ -6,6 +6,8 @@
  This is a hobby project done by Telkota.
  I wanted more experience in coding/programming, and at the same time maybe have something to show off. 
 
+ *Edit 18th nov: I doubt I'll continue updating this, due to it never being utilized. It was an alright project to do at least*
+
  *As such I haven't really set up any licensing on it, along with it being a project made by a newbie so this project probably ain't the best resource to take from either.*
  
  There's probably some bugs to iron out, and code might be messy and/or confusing.
